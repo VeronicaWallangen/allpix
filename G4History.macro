@@ -1,0 +1,13 @@
+/tracking/verbose 0
+/allpix/phys/verbose 1
+/gps/particle pi-
+/gps/pos/type Plane
+/gps/pos/shape Rectangle
+/gps/pos/centre 0.0 0.0 -1000.0 mm
+/gps/pos/halfy 5000. um
+/gps/pos/halfx 5000. um
+/gps/direction 0 0 1
+/gps/energy 120.0 GeV
+/allpix/beam/frames 1
+/allpix/beam/type const 1
+/allpix/beam/on

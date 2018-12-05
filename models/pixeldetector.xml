@@ -102,7 +102,7 @@
 <!-- FEI4 -->
 <pixeldet id="200,201">
 
-<digitizer>FEI3Standard</digitizer>
+<digitizer>FEI4RadDamage</digitizer>
 
 <npix_x>80</npix_x>
 <npix_y>336</npix_y>
@@ -116,7 +116,6 @@
 <chip_hy units="um">8400</chip_hy>
 <chip_hz units="um">195.0</chip_hz>
 
-
 <chip_offsetx units="um">0.</chip_offsetx>
 <chip_offsety units="um">-1020.</chip_offsety>
 <chip_offsetz units="um">0.</chip_offsetz>
@@ -126,8 +125,6 @@
 <bump_offset_x units="um">-70.0</bump_offset_x>
 <bump_offset_y units="um">0.0</bump_offset_y>
 <bump_dr units="um">2.0</bump_dr>
-
-
 
 <sensor_resistivity>5000.0</sensor_resistivity>
 
@@ -154,6 +151,61 @@
 
 </pixeldet>
 
+<!-- FEI4 3D (IBL) -->
+<pixeldet id="202">
+
+<digitizer>FEI4RadDamage3D</digitizer>
+
+<npix_x>80</npix_x>
+<npix_y>336</npix_y>
+<npix_z>0</npix_z>
+
+<pixsize_x units="um">125.</pixsize_x>
+<pixsize_y units="um">25.</pixsize_y>
+<pixsize_z units="um">115.</pixsize_z>
+
+<chip_hx units="um">10000</chip_hx>
+<chip_hy units="um">8400</chip_hy>
+<chip_hz units="um">195.0</chip_hz>
+
+<chip_offsetx units="um">0.</chip_offsetx>
+<chip_offsety units="um">-1020.</chip_offsety>
+<chip_offsetz units="um">0.</chip_offsetz>
+
+<bump_radius units="um">9.0</bump_radius>
+<bump_height units="um">20.0</bump_height>
+<bump_offset_x units="um">-70.0</bump_offset_x>
+<bump_offset_y units="um">0.0</bump_offset_y>
+<bump_dr units="um">2.0</bump_dr>
+
+<sensor_resistivity>20000.0</sensor_resistivity>
+
+<chip_posx units="um">0.</chip_posx>
+<chip_posy units="um">0.</chip_posy>
+<chip_posz units="um">0.</chip_posz>
+
+<sensor_hx units="um">10000</sensor_hx>
+<sensor_hy units="um">8400</sensor_hy>
+<sensor_hz units="um">115.0</sensor_hz>
+
+<sensor_gr_excess_htop units="um">100.0</sensor_gr_excess_htop>
+<sensor_gr_excess_hbottom units="um">100.0</sensor_gr_excess_hbottom>
+<sensor_gr_excess_hright units="um">100.0</sensor_gr_excess_hright>
+<sensor_gr_excess_hleft units="um">100.0</sensor_gr_excess_hleft>
+
+<sensor_posx units="mm">-4.3</sensor_posx>
+<sensor_posy units="mm">28.2</sensor_posy>
+<sensor_posz units="mm">0.</sensor_posz>
+
+<pcb_hx units="mm">26.5</pcb_hx>
+<pcb_hy units="mm">47.0</pcb_hy>
+<pcb_hz units="mm">0.80</pcb_hz>
+
+
+
+</pixeldet>
+
+
 <!-- Timepix3 -->
 <pixeldet id="10000">
 
@@ -170,7 +222,6 @@
 <chip_hx units="um">1600</chip_hx>
 <chip_hy units="um">1600</chip_hy>
 <chip_hz units="um">25.0</chip_hz>
-
 
 <bump_radius units="um">9.0</bump_radius>
 <bump_height units="um">20.0</bump_height>

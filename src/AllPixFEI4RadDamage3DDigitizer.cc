@@ -44,10 +44,10 @@ AllPixFEI4RadDamage3DDigitizer::AllPixFEI4RadDamage3DDigitizer(G4String modName,
 	//////////////////////////////////////////////////////////////////
 
 	// Physics switches
-	ITkGeometry = true; //use ITk dimensions (50umx50um), if false use IBL dimensions (250umx50um)
+	ITkGeometry = false; //use ITk dimensions (50umx50um), if false use IBL dimensions (250umx50um)
 	doDiff = true; //include diffusion
-    	doRamo = true; //include induced charge (set to false to neglect induced charge and only record charge from electrons that make it all the way to the collecting electrode)
-	doRamoNeighbors = true; //include induced charge contribution from nearest neighboring pixels
+    doRamo = true; //include induced charge (set to false to neglect induced charge and only record charge from electrons that make it all the way to the collecting electrode)
+	doRamoNeighbors = false; //include induced charge contribution from nearest neighboring pixels
 	doChunkCorrection = false; //include unsmearing
 
 	// Fetching geometry info from pixeldetector.xml
@@ -65,8 +65,8 @@ AllPixFEI4RadDamage3DDigitizer::AllPixFEI4RadDamage3DDigitizer(G4String modName,
 	betaElectrons = 3.0E-16; //cm2/ns; The charge-trapping probability is t = -tau*ln(u), for u ~ Uniform(0,1) and tau^{-1}=beta*fluence.  The value of beta might be slightly higher for holes than electrons, but it is hard to say (we ignore this effect here).  See e.g. https://cds.cern.ch/record/685542/files/indet-2003-014.pdf.
 	//Conditions
 	elec = 3.64*eV;//average energy required to produce a e/h pair in Si.  This has been known for a long time - see for instance http://journals.aps.org/prb/pdf/10.1103/PhysRevB.1.2945.  It depends a little on temperature, but we are ignoring that effect here.
-	fluence = 1e16; // neq/cm^2
-	temperature = 258;// ITk: 258 K, IBL: 263.5 K
+	fluence = 1e14; // neq/cm^2
+	temperature = 263.5;// ITk: 258 K, IBL: 263.5 K
 	threshold = 600*elec; //This is the threshold for charge collection. Min. stable threshold RD53A: 600e
 	//tuning = 5./(20000*elec); //for X ToT @ Y e, this is X/Y so that a deposited energy of Y gives a ToT of X.  Typical values are 5 ToT @ 20ke.
 	tuning = 5./(11000*elec);
@@ -81,10 +81,9 @@ AllPixFEI4RadDamage3DDigitizer::AllPixFEI4RadDamage3DDigitizer(G4String modName,
 	eFieldMap=0;
 	TFile* inputfile;
 	if (!ITkGeometry) {
-		inputfile=new TFile("/afs/cern.ch/user/v/vewallan/public/TCADmaps/outputfiles/phi_1e16_260V.root");
+		inputfile=new TFile("/allpix/allpix/TCADmaps/phi_1e14_20V.root");
 	} else {
-		inputfile=new TFile("/afs/cern.ch/user/v/vewallan/Allpix/allpix/ITkMaps/rootfiles/phi_1e16_140V.root");
-		//TFile* inputfile=new TFile("/afs/cern.ch/user/v/vewallan/public/TCADmaps/3DITk/3DITk_Phi1e16_Vbias40.root");
+		inputfile=new TFile("/allpix/allpix/TCADmaps/TCADmaps/phi_1e14_20V.root");
 	}
 	eFieldMap=(TH2F*)inputfile->Get("efield");
 	if (eFieldMap == 0) G4cout << "Unsuccessful picking up histogram: eFieldMap" << G4endl;
@@ -263,7 +262,12 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 
 	// Loop over the whole Hits Collection - this spreads out the effect of the hit over its path through the pixel 
 	G4int nEntries = hitsCollection->entries();
-	//G4int nEntries = 13; //23;
+    //G4int nEntries = 13; //23;
+    
+    ofstream outfileE;
+    outfileE.open("/allpix/allpix/outputdata/entries.txt", std::ofstream::app);
+    outfileE << nEntries << "\n";
+    outfileE.close();
 
 	std::vector<pair<int, int>> hitPixelPair;
 
@@ -275,18 +279,18 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 	for(G4int itr  = 0 ; itr < nEntries ; itr++) {
 
 		//Get pixel coordinates (note that here the origin has been adjusted to the bottom left corner NOT the middle of the pixel)
-		//G4double xpos = 10*1e-3;
-		//G4double ypos = 10*1e-3;
+		G4double xpos = 110*1e-3;
+		G4double ypos = 45*1e-3;
 		//G4double zpos = 10*itr+10;//detectorThickness/2. - (*hitsCollection)[itr]->GetPosWithRespectToPixel().z();
 
-		G4double xpos = (*hitsCollection)[itr]->GetPosWithRespectToPixel().x() + pitchX/2;
-		G4double ypos = (*hitsCollection)[itr]->GetPosWithRespectToPixel().y() + pitchY/2;
+		//G4double xpos = (*hitsCollection)[itr]->GetPosWithRespectToPixel().x() + pitchX/2;
+		//G4double ypos = (*hitsCollection)[itr]->GetPosWithRespectToPixel().y() + pitchY/2;
 
 		G4double efield = GetElectricField(xpos,ypos);
 
 		//G4double eHitTotal = (*hitsCollection)[itr]->GetEdep()/(1.0*eV);
-		G4double eHitTotal = (*hitsCollection)[itr]->GetEdep(); // Energy deposition for the hit, (MeV)
-		//G4double eHitTotal = 2.91*1e-3;//800*3.64;
+		//G4double eHitTotal = (*hitsCollection)[itr]->GetEdep(); // Energy deposition for the hit, (MeV)
+		G4double eHitTotal = 2.91*1e-3;//800*3.64;
 
 	    	/*ofstream outfile;	   	
 	    	outfile.open("/tmp/vewallan/protontrack.txt", std::ofstream::app);
@@ -345,11 +349,11 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 
 		    		if (doDiff) { 
 
-					// if subcharge trapped use drift time to determine diffusion distribution, else use time-to-electrode
-					G4double Dt = GetMobility(efield,isHole)*(0.024)*min(driftTime,timeToElectrode)*temperature/273.;
-		    			G4double rdif=sqrt(Dt)/1000; //in mm
-		    			xposDiff=xpos+rdif*CLHEP::RandGauss::shoot(0,1);
-		    			yposDiff=ypos+rdif*CLHEP::RandGauss::shoot(0,1);
+                        // if subcharge trapped use drift time to determine diffusion distribution, else use time-to-electrode
+                        G4double Dt = GetMobility(efield,isHole)*(0.024)*min(driftTime,timeToElectrode)*temperature/273.;
+                        G4double rdif=sqrt(Dt)/1000; //in mm
+                        xposDiff=xpos+rdif*CLHEP::RandGauss::shoot(0,1);
+                        yposDiff=ypos+rdif*CLHEP::RandGauss::shoot(0,1);
 
 		    			// Account for drifting into another pixel 
 		    			while (xposDiff > pitchX){
@@ -408,10 +412,10 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 
 						//Ramo init different if charge diffused into neighboring pixel -> change primary pixel!!
 						//IBL dimensions (Ramo map over 500umx350um pixel area)
-			    			G4double ramoInit = GetRamoPotential(xpos+pitchX*(0.5+i),ypos+pitchY*(3+j));
+                        G4double ramoInit = GetRamoPotential(xpos+pitchX*(0.5+i),ypos+pitchY*(3+j));
 						G4double ramoFinal = GetRamoPotential(xposFinal+pitchX*(0.5+i),yposFinal+pitchY*(3+j));
 						if (ITkGeometry) {//ITk dimensions (Ramo map over 200umx200um pixel area)
-			    				ramoInit = GetRamoPotential(xpos+pitchX*(1.5+i),ypos+pitchY*(1.5+j));
+                            ramoInit = GetRamoPotential(xpos+pitchX*(1.5+i),ypos+pitchY*(1.5+j));
 							ramoFinal = GetRamoPotential(xposFinal+pitchX*(1.5+i),yposFinal+pitchY*(1.5+j));
 						}
 
@@ -424,12 +428,12 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 						G4double eHitRamo = (1-2*isHole)*eHit*(ramoFinal - ramoInit);
 						inducedCharge+=eHitRamo;
 
-						/*if (!isHole) {
-							ofstream outfile;	   	
-	    						outfile.open("/tmp/vewallan/track_electrons.txt", std::ofstream::app);
-	    						outfile << xpos*1e3 << "	" << xposFinal*1e3 << "	" << ypos*1e3 << "	" << yposFinal*1e3 << "	" << eHitRamo/eHit << "\n";
-	    						outfile.close();
-						} else {
+						if (!isHole) {
+							ofstream outfile;
+                            outfile.open("/allpix/allpix/outputdata/track_electrons_phi1e14_Diff.txt", std::ofstream::app);
+                            outfile << xpos*1e3 << "	" << ypos*1e3 << "	" << xposFinal*1e3 << "	" << yposFinal*1e3 << "	" << eHitRamo/eHit << "\n";
+                             outfile.close();
+						} /*else {
 							ofstream outfile1;	   	
 	    						outfile1.open("/tmp/vewallan/track_holes.txt", std::ofstream::app);
 	    						outfile1 << xpos*1e3 << "	" << xposFinal*1e3 << "	" << ypos*1e3 << "	" << yposFinal*1e3 << "	" << eHitRamo/eHit << "\n";
@@ -574,12 +578,12 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 	//***
 
 	//***temporary for cluster properties
-	if (clusterSize > 0) {
+	/*if (clusterSize > 0) {
 		ofstream outfile;	 
 		outfile.open("/tmp/vewallan/clusterInfo_phi1e16_theta80_10000evts.txt", std::ofstream::app); //theta = 90 degrees - traditional theta
 		outfile << clusterSize << " " << clusterCharge << "	" << clusterToT << "\n";
 		outfile.close();
-	}
+	}*/
 	//***
 	
 	G4int dc_entries = m_digitsCollection->entries();

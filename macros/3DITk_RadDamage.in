@@ -1,0 +1,129 @@
+####################################################################
+# Test sensors
+####################################################################
+# EUDET Planes
+
+# Al Holder
+#/allpix/extras/setTestStructureType 1
+#/allpix/extras/setTestStructurePosition 0. 0. 0. mm
+#/allpix/extras/setTestStructureRotation 0. 180. 0. deg
+#/allpix/extras/setTestStructureDetLink 300
+# Mimosa detector
+/allpix/det/setId        300
+/allpix/det/setPosition  0.0 0.0 0.0 mm
+/allpix/det/setRotation  0.0 180.0 180.0 deg
+
+# Al Holder
+#/allpix/extras/setTestStructureType 1
+#/allpix/extras/setTestStructurePosition 0. 0. 34.5 mm
+#/allpix/extras/setTestStructureRotation 0. 180. 0. deg
+#/allpix/extras/setTestStructureDetLink 301
+# Mimosa detector.
+/allpix/det/setId        301
+/allpix/det/setPosition  0.0 0.0 34.5 mm
+/allpix/det/setRotation  0.0 180.0 180.0 deg
+
+# Al Holder
+#/allpix/extras/setTestStructureType 1
+#/allpix/extras/setTestStructurePosition 0. 0. 69.5 mm
+#/allpix/extras/setTestStructureRotation 0. 180. 0. deg
+#/allpix/extras/setTestStructureDetLink 302
+# Mimosa detector
+/allpix/det/setId        302
+/allpix/det/setPosition  0.0 0.0 69.5 mm
+/allpix/det/setRotation  0.0 180.0 180.0 deg
+
+# Al Holder
+#/allpix/extras/setTestStructureType 1
+#/allpix/extras/setTestStructurePosition 0. 0. 452. mm
+#/allpix/extras/setTestStructureRotation 0. 180. 0. deg
+#/allpix/extras/setTestStructureDetLink 303
+# Mimosa detector
+/allpix/det/setId        303
+/allpix/det/setPosition  0.0 0.0 452.0 mm
+/allpix/det/setRotation  0.0 180.0 180.0 deg
+
+# Al Holder
+#/allpix/extras/setTestStructureType 1
+#/allpix/extras/setTestStructurePosition 0. 0. 487. mm
+#/allpix/extras/setTestStructureRotation 0. 180. 0. deg
+#/allpix/extras/setTestStructureDetLink 304
+# Mimosa detector
+/allpix/det/setId        304
+/allpix/det/setPosition  0.0 0.0 487.0 mm
+/allpix/det/setRotation  0.0 180.0 180.0 deg
+
+# Al Holder
+#/allpix/extras/setTestStructureType 1
+#/allpix/extras/setTestStructurePosition 0. 0. 522. mm
+#/allpix/extras/setTestStructureRotation 0. 180.  0. deg
+#/allpix/extras/setTestStructureDetLink 305
+# Mimosa detector
+/allpix/det/setId        305
+/allpix/det/setPosition  0.0 0.0 522.0 mm
+/allpix/det/setRotation  0.0 180.0 180.0 deg
+
+############################
+# Detector 0
+/allpix/det/setId        202
+/allpix/det/setPosition  0.0 0.0 271.85 mm
+/allpix/det/setRotation  80.0 0.0 0.0 deg	# 15 degree rotation in phi; do I need the usual 90 deg in Z?	#1:theta (polar NOT from +z), 2: longitudal plane, 3: phi (azimuthal angle in transverse plane)
+##### end of detector 0 #####
+
+####################################################################
+# Build detectors
+/allpix/phys/Physics emstandard_opt0
+/run/initialize
+/allpix/det/update
+
+####################################################################
+# Verbose control
+/run/verbose 0
+/control/verbose 0
+/control/saveHistory
+/tracking/verbose 0
+/allpix/phys/verbose 1
+
+####################################################################
+# Visualization
+#/vis/scene/create
+#/vis/scene/add/volume World -1 2
+#/vis/viewer/set/style s
+#/vis/open OGL 600x600-0+0
+#/vis/open OGLSX
+#/vis/viewer/set/background 0.3 0.9 0.9
+#/vis/viewer/set/viewpointThetaPhi 90 0
+#/vis/viewer/set/viewpointThetaPhi 70 0
+#/vis/viewer/zoom 1.0
+#/vis/viewer/flush
+
+####################################################################
+# Draw trajectories at end of event, showing trajectory points as
+# markers of size 2 pixels
+#/vis/scene/add/trajectories
+#/vis/modeling/trajectories/create/drawByCharge
+#/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts false
+#/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
+#/vis/scene/endOfEventAction accumulate
+
+####################################################################
+# Source GPS
+/gps/particle pi-
+#/gps/particle proton
+/gps/pos/type Plane
+/gps/pos/shape Rectangle
+/gps/pos/centre 0.0 0.0 -1000.0 mm
+/gps/pos/halfy 5000. um
+/gps/pos/halfx 5000. um
+/gps/direction 0 0 1
+/gps/energy 120.0 GeV
+
+####################################################################
+# Shoot
+/allpix/beam/frames 1 #number of times Digitize() function is run
+/allpix/beam/type const 1
+/allpix/beam/on
+
+#/vis/viewer/rebuild
+
+
