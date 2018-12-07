@@ -8,6 +8,6 @@
 /gps/pos/halfx 5000. um
 /gps/direction 0 0 1
 /gps/energy 120.0 GeV
-/allpix/beam/frames 1
+/allpix/beam/frames 100
 /allpix/beam/type const 1
 /allpix/beam/on

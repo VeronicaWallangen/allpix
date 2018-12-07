@@ -23,6 +23,7 @@
 //Included for RadDamage
 #include "TFile.h"
 #include "CLHEP/Random/RandGauss.h"
+#include <G4INCLRandom.hh>
 #include "CLHEP/Random/RandFlat.h"
 #include "TROOT.h"
 
@@ -352,13 +353,15 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
                         // if subcharge trapped use drift time to determine diffusion distribution, else use time-to-electrode
                         G4double Dt = GetMobility(efield,isHole)*(0.024)*min(driftTime,timeToElectrode)*temperature/273.;
                         G4double rdif=sqrt(Dt)/1000; //in mm
-                        xposDiff=xpos+rdif*CLHEP::RandGauss::shoot(0,1);
-                        yposDiff=ypos+rdif*CLHEP::RandGauss::shoot(0,1);
+                        xposDiff=xpos+(rdif*1e-3)*CLHEP::RandGauss::shoot(0,1);
+                        yposDiff=ypos+(rdif*1e-3)*CLHEP::RandGauss::shoot(0,1);
+                        //xposDiff=xpos+rdif*CLHEP::RandGauss::shoot(0,0.5);
+                        //yposDiff=ypos+rdif*CLHEP::RandGauss::shoot(0,0.5);
 
 		    			// Account for drifting into another pixel 
-		    			while (xposDiff > pitchX){
+		    			/*while (xposDiff > pitchX){
 		      				extraPixel.first = extraPixel.first + 1;               // increments or decrements pixel count in x
-		      				xposDiff = xposDiff - pitchX;                              // moves xpos coordinate 1 pixel over in x
+                            xposDiff = xposDiff - pitchX;                              // moves xpos coordinate 1 pixel over in x
 		    			}
 		    			while (xposDiff < 0){
 		      				extraPixel.first = extraPixel.first - 1;
@@ -366,15 +369,20 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 		    			}
 		    			while (yposDiff > pitchY){
 		      				extraPixel.second = extraPixel.second + 1;               // increments or decrements pixel count in y
-		      				yposDiff = yposDiff - pitchY;                              // moves xpos coordinate 1 pixel over in y
+                            yposDiff = yposDiff - pitchY;                              // moves xpos coordinate 1 pixel over in y
 		    			}
 		    			while (yposDiff < 0){
 		      				extraPixel.second = extraPixel.second - 1;
 		      				yposDiff = yposDiff + pitchY;
-		    			}
+		    			}*/
 
 
 		    		} //doDiff
+                    
+                    ofstream outfileD;
+                    outfileD.open("/allpix/allpix/outputdata/diffusion.txt", std::ofstream::app);
+                    outfileD << xpos*1e3 << "    " << xposDiff*1e3 << "    " << ypos*1e3 << "    " << yposDiff*1e3 << " " << CLHEP::RandGauss::shoot(0,1) << "\n";
+                    outfileD.close();
 
 				G4double drift_time_constant = trappingTimeElectrons;
 				if (isHole) drift_time_constant = trappingTimeHoles;
@@ -430,7 +438,7 @@ void AllPixFEI4RadDamage3DDigitizer::Digitize(){
 
 						if (!isHole) {
 							ofstream outfile;
-                            outfile.open("/allpix/allpix/outputdata/track_electrons_phi1e14_Diff.txt", std::ofstream::app);
+                            outfile.open("/allpix/allpix/outputdata/track_electrons_phi1e14_Diff_small.txt", std::ofstream::app);
                             outfile << xpos*1e3 << "	" << ypos*1e3 << "	" << xposFinal*1e3 << "	" << yposFinal*1e3 << "	" << eHitRamo/eHit << "\n";
                              outfile.close();
 						} /*else {

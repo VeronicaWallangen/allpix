@@ -67,7 +67,7 @@
 # Detector 0
 /allpix/det/setId        202
 /allpix/det/setPosition  0.0 0.0 271.85 mm
-/allpix/det/setRotation  0.0 0.0 0.0 deg	# 15 degree rotation in phi; do I need the usual 90 deg in Z?	#1:theta (polar NOT from +z), 2: longitudal plane, 3: phi (azimuthal angle in transverse plane)
+/allpix/det/setRotation  15.0 15.0 0.0 deg	# 15 degree rotation in phi; do I need the usual 90 deg in Z?	#1:theta (polar NOT from +z), 2: longitudal plane, 3: phi (azimuthal angle in transverse plane)
 ##### end of detector 0 #####
 
 ####################################################################
@@ -119,6 +119,6 @@
 
 ####################################################################
 # Shoot
-/allpix/beam/frames 1 #number of times Digitize() function is run
+/allpix/beam/frames 100 #number of times Digitize() function is run
 /allpix/beam/type const 1
 /allpix/beam/on
